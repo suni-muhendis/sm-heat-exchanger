@@ -1,4 +1,15 @@
-"""Heat exchanger evaluation environment."""
+"""sm_heat_exchanger — heat-exchanger evaluation environment on sm-core.
+
+Registered as ``heat_exchanger`` in the ``sm_core.environments`` entry-point
+group, so once this package is installed:
+
+    from sm_core import make_env
+
+    env = make_env("heat_exchanger")
+    result = env.evaluate(task_id, task_params, design_id, design)
+"""
+
+__version__ = "0.8.0"
 
 
 def make_env(**kwargs):

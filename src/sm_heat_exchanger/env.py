@@ -5,9 +5,9 @@ from typing import Dict, Any, List, Optional, Sequence
 import ht
 from pydantic import ValidationError
 
-from ...core.base_environment import BaseEnvironment
-from ...core.base_score import BaseScoreFunction
-from ...core.types import Requirement
+from sm_core import BaseEnvironment
+from sm_core import BaseScoreFunction
+from sm_core import Requirement
 from .schema import HeatExchangerDesign
 from .drc import run_heat_exchanger_drc
 from .simulator import HeatExchangerSimulator

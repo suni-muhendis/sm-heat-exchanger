@@ -5,9 +5,9 @@ from pathlib import Path
 import ht
 import pytest
 
-from sunimuhendis import make_env
-from sunimuhendis.environments.heat_exchanger.drc import run_heat_exchanger_drc
-from sunimuhendis.environments.heat_exchanger.simulator import HeatExchangerSimulator
+from sm_core import make_env
+from sm_heat_exchanger.drc import run_heat_exchanger_drc
+from sm_heat_exchanger.simulator import HeatExchangerSimulator
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,13 +15,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _design():
     return json.loads(
-        (ROOT / "examples/designs/heat_exchanger_valid_001.json").read_text()
+        (ROOT / "examples/design_001.json").read_text()
     )
 
 
 def _task():
     return json.loads(
-        (ROOT / "configs/tasks/heat_exchanger/task_001.json").read_text()
+        (ROOT / "examples/task_001.json").read_text()
     )
 
 

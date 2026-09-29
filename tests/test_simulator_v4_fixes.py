@@ -2,15 +2,15 @@
 Tests for the simulator V4 corrections.
 
 Each test pins one defect found by the physics audit
-(``reports/simulator_v3_physics_audit.md``).
+(``docs/simulator_v3_physics_audit.md``).
 """
 
 import math
 
 import pytest
 
-from sunimuhendis.environments.heat_exchanger.drc import run_heat_exchanger_drc
-from sunimuhendis.environments.heat_exchanger.simulator import HeatExchangerSimulator
+from sm_heat_exchanger.drc import run_heat_exchanger_drc
+from sm_heat_exchanger.simulator import HeatExchangerSimulator
 
 
 BASE_DESIGN = {

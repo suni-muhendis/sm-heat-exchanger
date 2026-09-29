@@ -2,11 +2,11 @@
 
 import pytest
 
-from sunimuhendis import make_env
-from sunimuhendis.core.base_environment import BaseEnvironment
-from sunimuhendis.core.base_score import BaseScoreFunction
-from sunimuhendis.core.base_simulator import BaseSimulator
-from sunimuhendis.core.types import Requirement, ScoreResult
+from sm_core import make_env
+from sm_core import BaseEnvironment
+from sm_core import BaseScoreFunction
+from sm_core import BaseSimulator
+from sm_core import Requirement, ScoreResult
 
 
 SAMPLES = 3000

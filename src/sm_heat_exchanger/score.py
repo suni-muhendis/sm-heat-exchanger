@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
-from ...core.base_score import BaseScoreFunction
-from ...core.types import ScoreResult
+from sm_core import BaseScoreFunction
+from sm_core import ScoreResult
 
 class HeatExchangerScoreV1(BaseScoreFunction):
     VERSION = "heat_exchanger_score_v1"

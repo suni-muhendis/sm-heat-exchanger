@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=77.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sm-heat-exchanger"
+version = "0.8.0"
+description = "Heat-exchanger evaluation environment for sm-core: schema, design rules, physics simulator and score."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+keywords = ["engineering-design", "physics-simulation", "heat-exchanger", "llm", "benchmarking"]
+authors = [
+    {name = "Mehmet Fatih Reyhan"},
+    {name = "Ertuğrul Şahin"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "sm-core @ git+https://github.com/suni-muhendis/sm-core.git@v0.8.0",
+    "ht",
+    "fluids",
+]
+
+[project.optional-dependencies]
+# The Latin-hypercube design sampler.
+samplers = ["scipy"]
+dev = ["pytest>=7.0.0", "build"]
+
+# sm_core.make_env("heat_exchanger") finds the environment through this entry point.
+[project.entry-points."sm_core.environments"]
+heat_exchanger = "sm_heat_exchanger:make_env"
+
+[project.urls]
+Homepage = "https://github.com/suni-muhendis/sm-heat-exchanger"
+Repository = "https://github.com/suni-muhendis/sm-heat-exchanger.git"
+Issues = "https://github.com/suni-muhendis/sm-heat-exchanger/issues"
+Changelog = "https://github.com/suni-muhendis/sm-heat-exchanger/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["sm_heat_exchanger*"]

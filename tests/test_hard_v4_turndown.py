@@ -21,11 +21,11 @@ import os
 
 import pytest
 
-from sunimuhendis import make_env
+from sm_core import make_env
 
 
 HERE = os.path.dirname(__file__)
-TASK_PATH = os.path.join(HERE, "../results/zero_shot/heat_exchanger_hard_v4/task.json")
+TASK_PATH = os.path.join(HERE, "fixtures/heat_exchanger_hard_v4.json")
 
 
 @pytest.fixture(scope="module")

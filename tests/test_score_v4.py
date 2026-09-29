@@ -13,10 +13,10 @@ import os
 
 import pytest
 
-from sunimuhendis import make_env
-from sunimuhendis.environments.heat_exchanger.drc import run_heat_exchanger_drc
-from sunimuhendis.environments.heat_exchanger.score import get_score_function
-from sunimuhendis.environments.heat_exchanger.simulator import HeatExchangerSimulator
+from sm_core import make_env
+from sm_heat_exchanger.drc import run_heat_exchanger_drc
+from sm_heat_exchanger.score import get_score_function
+from sm_heat_exchanger.simulator import HeatExchangerSimulator
 
 
 TASK = {
@@ -249,7 +249,7 @@ def test_an_undersized_nozzle_still_raises_the_erosion_warning():
 
 def test_hard_v3_task_file_is_healthy(env):
     path = os.path.join(os.path.dirname(__file__),
-                        "../results/zero_shot/heat_exchanger_hard_v3/task.json")
+                        "fixtures/heat_exchanger_hard_v3.json")
     with open(path, encoding="utf-8") as handle:
         task = json.load(handle)
 

@@ -11,9 +11,9 @@ a malformed task is loud rather than quiet.
 
 import pytest
 
-from sunimuhendis import make_env
-from sunimuhendis.environments.heat_exchanger.env import HeatExchangerEnv
-from sunimuhendis.environments.heat_exchanger.simulator import HeatExchangerSimulator
+from sm_core import make_env
+from sm_heat_exchanger.env import HeatExchangerEnv
+from sm_heat_exchanger.simulator import HeatExchangerSimulator
 
 
 TASK = {
@@ -75,7 +75,7 @@ def test_an_empty_block_is_the_same_as_no_block(env):
 
 def test_the_default_hook_leaves_the_design_alone():
     """BaseEnvironment's default must not touch anything, for other environments."""
-    from sunimuhendis.core.base_environment import BaseEnvironment
+    from sm_core import BaseEnvironment
     prepared = BaseEnvironment.prepare_simulation_inputs(
         object(), {"a": 1}, {"operating_conditions": {"whatever": 2}})
     assert prepared == {"a": 1}

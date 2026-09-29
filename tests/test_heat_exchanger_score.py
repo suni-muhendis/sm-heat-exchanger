@@ -2,9 +2,8 @@ import pytest
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sunimuhendis.environments.heat_exchanger.score import HeatExchangerScoreV1
+from sm_heat_exchanger.score import HeatExchangerScoreV1
 
 def test_reward_invalid():
     rew = HeatExchangerScoreV1()

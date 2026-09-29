@@ -1,27 +1,24 @@
-SM-Bench
+sm-heat-exchanger
 Copyright 2026 Mehmet Fatih Reyhan and Ertuğrul Şahin
 
-This product includes software developed by the SM-Bench project (Suni Muhendis).
+This product includes software developed by the Suni Muhendis project.
 
-Licensing summary
------------------
 Source code in this repository is licensed under the Apache License,
 Version 2.0. See LICENSE.
 
-Benchmark data, task definitions, research notes and reports are covered
-separately. See results/LICENSE.md.
+The task definitions and calibration records under tests/fixtures/ are copies
+of SM-Bench benchmark data, licensed there under CC BY 4.0
+(https://github.com/suni-muhendis/sm-bench/blob/main/results/LICENSE.md).
 
 Third-party components
 ----------------------
-The distributed Python package declares the following core and environment
-dependencies, each governed by its own upstream license. Their source trees
-are not copied into the sunimuhendis wheel:
+The package declares the following dependencies, each governed by its own
+upstream license. Their source trees are not copied into the wheel:
 
+  sm-core      - Apache License 2.0
   ht           - MIT License
   fluids       - BSD License
-  pydantic     - MIT License
-  json-repair  - MIT License
+  scipy        - BSD License (optional, samplers extra)
 
-Repository-only benchmark and development tools use further dependencies listed
-in pyproject.toml and requirements.txt. This summary is not a substitute for the
-license material included with each installed distribution.
+This summary is not a substitute for the license material included with each
+installed distribution.

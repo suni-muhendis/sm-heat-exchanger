@@ -2,11 +2,10 @@ import pytest
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sunimuhendis.environments.registry import make_env
-from sunimuhendis.environments.heat_exchanger.env import HeatExchangerEnv
-from sunimuhendis.environments.heat_exchanger.score import (
+from sm_core import make_env
+from sm_heat_exchanger.env import HeatExchangerEnv
+from sm_heat_exchanger.score import (
     HeatExchangerScoreV1,
     HeatExchangerScoreV2,
     HeatExchangerScoreV3,

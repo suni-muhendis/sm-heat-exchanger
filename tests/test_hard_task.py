@@ -3,15 +3,15 @@ from pathlib import Path
 
 import pytest
 
-from sunimuhendis import make_env
+from sm_core import make_env
 
 
 def test_hard_task_reference_is_reproducibly_feasible():
     root = Path(__file__).resolve().parents[1]
     task = json.loads(
-        (root / "results/zero_shot/heat_exchanger_hard_v1/task.json").read_text()
+        (root / "tests/fixtures/heat_exchanger_hard_v1.json").read_text()
     )
-    report = json.loads((root / "reports/hard_task_calibration.json").read_text())
+    report = json.loads((root / "tests/fixtures/hard_task_calibration.json").read_text())
     reference = report["reference"]
     env = make_env("heat_exchanger")
     result = env.evaluate(task["task_id"], task, "reference", reference["design"])
@@ -25,10 +25,10 @@ def test_hard_task_reference_is_reproducibly_feasible():
 def test_hard_v2_top_calibration_design_is_feasible_and_reproducible():
     root = Path(__file__).resolve().parents[1]
     task = json.loads(
-        (root / "results/zero_shot/heat_exchanger_hard_v2/task.json").read_text()
+        (root / "tests/fixtures/heat_exchanger_hard_v2.json").read_text()
     )
     report = json.loads(
-        (root / "reports/hard_task_v2_calibration.json").read_text()
+        (root / "tests/fixtures/hard_task_v2_calibration.json").read_text()
     )
     reference = report["reference"]
     highest = report["highest_score"]

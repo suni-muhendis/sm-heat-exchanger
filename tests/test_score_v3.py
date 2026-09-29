@@ -1,6 +1,6 @@
 import pytest
 
-from sunimuhendis.environments.heat_exchanger.score import HeatExchangerScoreV3
+from sm_heat_exchanger.score import HeatExchangerScoreV3
 
 
 def _task(**overrides):
