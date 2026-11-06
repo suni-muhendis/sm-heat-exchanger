@@ -21,7 +21,7 @@ design (JSON) → schema → design rules → simulation → score
 ## Install
 
 ```bash
-pip install "sm-heat-exchanger @ git+https://github.com/suni-muhendis/sm-heat-exchanger.git@v0.8.0"
+pip install "sm-heat-exchanger @ git+https://github.com/suni-muhendis/sm-heat-exchanger.git@v0.9.0"
 ```
 
 This pulls in `sm-core` at the matching tag.
@@ -33,7 +33,7 @@ from sm_core import make_env
 
 env = make_env("heat_exchanger")
 task = {
-    "score_version": "heat_exchanger_score_v4",
+    "score_version": "heat_exchanger_score_v5",
     "target_heat_duty": 150000.0,
     "max_dp_tube": 50000.0,
     "max_dp_shell": 50000.0,

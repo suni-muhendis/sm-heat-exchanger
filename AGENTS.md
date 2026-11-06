@@ -26,7 +26,7 @@ The benchmark harness, recorded results, dashboard and site live in
 ## Rules
 
 - **Versions are real.** The simulator is `HeatExchangerSimulator.VERSION`;
-  each score function has its own `VERSION` (`heat_exchanger_score_v1…v4`).
+  each score function has its own `VERSION` (`heat_exchanger_score_v1…v5`).
   Any change that can move a number needs a new simulator or score version,
   and results from different versions are never pooled.
 - **Re-score before releasing.** Every design SM-Bench has on record must
@@ -35,14 +35,14 @@ The benchmark harness, recorded results, dashboard and site live in
   output; fluid properties are fixed and nothing in the evaluation path is
   random.
 - Prefer "score" over "reward" in new code and documentation.
-- Consumers pin tags (`@v0.8.0`), never branches. Record user-visible changes
+- Consumers pin tags (`@v0.9.0`), never branches. Record user-visible changes
   in `CHANGELOG.md`.
 
 ## Layout
 
 - `src/sm_heat_exchanger/schema.py`: the design schema (Pydantic, extra fields forbidden).
 - `drc.py`: design-rule checks. `geometry.py`: shared geometry helpers.
-- `simulator.py`: the physics. `score.py`: score V1–V4 and `SCORE_REGISTRY`.
+- `simulator.py`: the physics. `score.py`: score V1–V5 and `SCORE_REGISTRY`.
 - `env.py`: `HeatExchangerEnv`, operating conditions, secondary points, audit hooks.
 - `prompts.py`: `build_heat_exchanger_prompt`, the benchmark prompt.
 - `samplers/`: random, heuristic and Latin-hypercube design samplers.

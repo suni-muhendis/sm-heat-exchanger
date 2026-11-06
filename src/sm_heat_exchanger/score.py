@@ -1,3 +1,4 @@
+import math
 from typing import Dict, Any, Optional
 from sm_core import BaseScoreFunction
 from sm_core import ScoreResult
@@ -446,6 +447,149 @@ class HeatExchangerScoreV4(BaseScoreFunction):
         )
 
 
+class HeatExchangerScoreV5(BaseScoreFunction):
+    """Gated optimisation score with a logarithmic cost band and a firmer gate.
+
+    V5 keeps V4's structure (requirements are a gate worth ``gate_share``; the
+    rest is earned by cost and freedom from warnings) and changes two things
+    that a 30-task benchmark across thirteen models showed V4 measuring badly.
+
+    1. *Cost is judged on a ratio scale.* V4 rewards cost linearly between
+       ``cost_good`` and ``cost_bad`` and gives nothing beyond ``cost_bad``.
+       With task anchors calibrated at 0.8x and 4x a reference design, every
+       oversized design scored the same: designs that met the requirements
+       cost a median 1.3x the reference for one model, 5.8x for another and
+       37x for a third, and the last two earned an identical 0.30. Cost
+       overruns are multiplicative, so V5 measures them in log space: full
+       credit at ``cost_good`` or below, none at ``cost_good * cost_span`` or
+       above, and a straight line in ``log(cost)`` between. The default span
+       of 80 reaches 64x a reference design under the usual anchors, wider
+       than every feasible design on record. V5 does not read ``cost_bad``.
+
+    2. *Missing a requirement costs more.* Under V4 a design that falls short
+       earns ``gate_share`` scaled by how close it came, so a near miss (duty
+       at 90 % of target) scores about 0.29, level with an oversized design
+       that meets every requirement (0.30). A design that does not meet its
+       specification does not do the job, so V5 scales the near-miss credit
+       by ``miss_share`` (0.5 by default): a miss earns at most 0.15, and any
+       design that passes the gate outranks any design that does not. The
+       credit stays continuous in how close the design came.
+    """
+
+    VERSION = "heat_exchanger_score_v5"
+
+    def calculate_score(
+        self,
+        task_params: Dict[str, Any],
+        metrics: Dict[str, Any],
+        is_valid: bool = True,
+        error_message: Optional[str] = None,
+    ) -> ScoreResult:
+        if not is_valid:
+            return ScoreResult(
+                normalized_total=0.0,
+                is_valid=False,
+                error_message=error_message,
+            )
+
+        gate_share = task_params.get("gate_share", 0.30)
+        miss_share = task_params.get("miss_share", 0.50)
+        target_heat = task_params.get("target_heat_duty", 250000.0)
+        max_dp_tube = task_params.get("max_dp_tube", 10000.0)
+        max_dp_shell = task_params.get("max_dp_shell", 10000.0)
+
+        cost_good = task_params.get("cost_good", 2000.0)
+        cost_span = task_params.get("cost_span", 80.0)
+        warning_penalty = task_params.get("warning_penalty_per_warning", 0.10)
+
+        if not 0.0 <= gate_share <= 1.0:
+            raise ValueError("Score V5 requires 0 <= gate_share <= 1")
+        if not 0.0 <= miss_share <= 1.0:
+            raise ValueError("Score V5 requires 0 <= miss_share <= 1")
+        if target_heat <= 0 or max_dp_tube <= 0 or max_dp_shell <= 0:
+            raise ValueError("Score V5 heat and pressure-drop targets must be positive")
+        if cost_good <= 0 or cost_span <= 1.0:
+            raise ValueError("Score V5 requires cost_good > 0 and cost_span > 1")
+        if warning_penalty < 0:
+            raise ValueError("Score V5 penalty rate must be non-negative")
+
+        heat_duty = metrics.get("heat_duty_W", metrics.get("heat_duty", 0.0))
+        dp_tube = metrics.get(
+            "dp_tube_Pa", metrics.get("pressure_drop_tube", max_dp_tube * 2)
+        )
+        dp_shell = metrics.get(
+            "dp_shell_Pa", metrics.get("pressure_drop_shell", max_dp_shell * 2)
+        )
+        effectiveness = metrics.get("effectiveness", 0.0)
+        cost_annualised = metrics.get(
+            "cost_annualised_USD_per_yr", cost_good * cost_span
+        )
+        num_warnings = max(float(metrics.get("num_warnings", 0.0)), 0.0)
+
+        # ── 1. The gate (as V4) ───────────────────────────────────────
+        duty_progress = min(max(heat_duty / target_heat, 0.0), 1.0)
+        tube_progress = _limit_progress(dp_tube, max_dp_tube)
+        shell_progress = _limit_progress(dp_shell, max_dp_shell)
+
+        duty_met = heat_duty >= target_heat
+        tube_met = dp_tube <= max_dp_tube
+        shell_met = dp_shell <= max_dp_shell
+        unmet = [name for name, met in (
+            ("heat duty", duty_met),
+            ("tube pressure drop", tube_met),
+            ("shell pressure drop", shell_met),
+        ) if not met]
+
+        gate_progress = (duty_progress + tube_progress + shell_progress) / 3.0
+
+        # ── 2. Quality on a log cost scale, earned only past the gate ─
+        cost_reward = _log_band_reward(cost_annualised, cost_good, cost_good * cost_span)
+        quality = cost_reward
+        penalty_factor = max(1.0 - num_warnings * warning_penalty, 0.0)
+
+        if unmet:
+            gate_component = gate_share * miss_share * gate_progress
+            quality_component = 0.0
+        else:
+            gate_component = gate_share
+            quality_component = (1.0 - gate_share) * quality * penalty_factor
+        total = gate_component + quality_component
+
+        components = {
+            "gate_passed": 0.0 if unmet else 1.0,
+            "gate_progress": gate_progress,
+            "duty_progress": duty_progress,
+            "tube_drop_progress": tube_progress,
+            "shell_drop_progress": shell_progress,
+            "num_unmet_requirements": float(len(unmet)),
+            "cost_reward": cost_reward,
+            "cost_ratio_to_good": cost_annualised / cost_good,
+            "effectiveness": effectiveness,
+            "quality": quality,
+            "penalty_factor": penalty_factor,
+            "gate_component": gate_component,
+            "quality_component": quality_component,
+        }
+
+        return ScoreResult(
+            normalized_total=min(max(total, 0.0), 1.0),
+            components=components,
+            is_valid=True,
+            error_message=(
+                "Unmet requirement(s): {}".format(", ".join(unmet)) if unmet else None
+            ),
+        )
+
+
+def _log_band_reward(value: float, good: float, bad: float) -> float:
+    """Reward linear in ``log(value)``: 1.0 at or below ``good``, 0.0 at or above ``bad``."""
+    if value <= good:
+        return 1.0
+    if value >= bad:
+        return 0.0
+    return 1.0 - math.log(value / good) / math.log(bad / good)
+
+
 def _limit_progress(value: float, limit: float) -> float:
     """How close a not-to-exceed quantity is to its limit, as a 0-1 reward."""
     if value <= limit:
@@ -467,6 +611,7 @@ SCORE_REGISTRY = {
     "heat_exchanger_score_v2": HeatExchangerScoreV2,
     "heat_exchanger_score_v3": HeatExchangerScoreV3,
     "heat_exchanger_score_v4": HeatExchangerScoreV4,
+    "heat_exchanger_score_v5": HeatExchangerScoreV5,
 }
 
 def get_score_function(version: str) -> BaseScoreFunction:
